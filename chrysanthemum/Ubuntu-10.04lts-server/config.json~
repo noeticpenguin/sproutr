@@ -1,0 +1,5 @@
+{
+  "ami":"ami-714ba518", // public ubuntu 10.04 ami - 32 bit
+  "availability_zone" : "us-east-1a"
+}
+
