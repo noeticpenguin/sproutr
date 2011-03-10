@@ -46,7 +46,7 @@ function userdata() {
 
     echo "+++ Downloading, unzipping and prepparing Cookbooks"
     sudo chmod +x /root/userdata/packet/fetch_cookbooks.rb
-    sudo /root/userdata/packet/fetch_cookbooks.rb mongodb openssl build-essential mysql runit
+    sudo /root/userdata/packet/fetch_cookbooks.rb mongodb openssl build-essential mysql runit snmp
 
     echo "+++ Running Chef-solo"
     sudo chef-solo -j /root/userdata/packet/node.json

@@ -1,0 +1,19 @@
+use thor
+list instances and ami's
+launch = fire up new instance
+specify = create new instance template
+destroy = destroys an instance
+start = start an instance
+stop = stop an instance
+
+instance templates should
+    define chef recipies to run
+    define the config.json
+        specify the server name in the AWS control panel
+    create the userdata.sh
+    create the packet
+
+Packet/userdata.sh should set the hostname of the box
+    and write a custom recipe
+    and register the recipe with chef-server
+    

@@ -6,6 +6,7 @@
                 "recipe[mongodb::source]",
                 "recipe[mysql::client]",
                 "recipe[runit::default]",
-                "recipe[java::default]"
+                "recipe[java::default]",
+                "recipe[snmp::default]"
 	      ]
 }
