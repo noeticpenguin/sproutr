@@ -2,5 +2,11 @@
   "ami" : "ami-8ce517e5", //Bandwidth.com ec2 base AMI
   "availability_zone" : "us-east-1a",
   "key_name" : "Production",
-  "instance_type" : "c1.medium"
+  //"instance_type" : "c1.medium",
+  "volumes" : [
+    { "device" : "/dev/sdf1", "size" : 8 },
+    { "device" : "/dev/sdf2", "size" : 8 },
+    { "device" : "/dev/sdf3", "size" : 8 },
+    { "device" : "/dev/sdf4", "size" : 8 }
+   ]
 }
