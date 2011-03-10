@@ -1,6 +1,7 @@
 {
-  "ami":"ami-cef405a7", // public ubuntu 10.04 ami - 32 bit
+  "ami" : "ami-cef405a7", // public ubuntu 10.04 ami - 32 bit
   "availability_zone" : "us-east-1a",
+  "instance_type" : "m1.large",
   "key_name" : "Production"
 
 }
