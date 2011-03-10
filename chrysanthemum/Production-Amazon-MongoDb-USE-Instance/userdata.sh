@@ -22,7 +22,7 @@ function configure_drives() {
     pvcreate /dev/md0
     vgcreate vgdb /dev/md0
     lvcreate -n lvdb vgdb -l `/sbin/vgdisplay vgdb | grep Free | awk '{print $5}'`
-    mkfs.ext3 -q -L /database /dev/vgdb/lvdb
+    mkfs.ext3 -q -L /data /dev/vgdb/lvdb
     echo "/dev/vgdb/lvdb       /data   ext3   noatime,nosuid,nodev" >> /etc/fstab
     mkdir -p /data && mount /data
 }
