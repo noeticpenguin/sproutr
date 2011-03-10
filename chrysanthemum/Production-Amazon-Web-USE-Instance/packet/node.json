@@ -4,6 +4,7 @@
                 "recipe[apache2::mod_rewrite]",
                 "recipe[memcached::default]",
                 "recipe[mongodb::source]",
-                "recipe[mysql::server]"
+                "recipe[mysql::client]",
+                "recipe[runit::default]"
 	      ]
 }

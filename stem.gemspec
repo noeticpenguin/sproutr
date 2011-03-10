@@ -2,15 +2,15 @@ $spec = Gem::Specification.new do |s|
   s.specification_version = 2 if s.respond_to? :specification_version=
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
 
-  s.name = 'stem'
-  s.version = '0.5.4'
-  s.date = '2011-03-03'
+  s.name = 'stem2'
+  s.version = '0.5.5'
+  s.date = '2011-03-10'
 
   s.description = "minimalist EC2 instance management"
   s.summary     = "an EC2 instance management library designed to get out of your way and give you instances"
 
-  s.authors = ["Peter van Hardenberg", "Orion Henry", "Blake Gentry"]
-  s.email = ["pvh@heroku.com", "orion@heroku.com", "b@heroku.com"]
+  s.authors = ["Peter van Hardenberg", "Orion Henry", "Blake Gentry", "Kevin Poorman"]
+  s.email = ["pvh@heroku.com", "orion@heroku.com", "b@heroku.com", "kpoorman@bandwidth.com"]
 
   # = MANIFEST =
   s.files = %w[LICENSE README.md] + Dir["lib/**/*.rb"]
