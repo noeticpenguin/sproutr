@@ -1,9 +1,3 @@
 {
-  "run_list": [ "recipe[apache2::default]",
-                "recipe[apache2::mod_php5]",
-                "recipe[apache2::mod_rewrite]",
-                "recipe[memcached::default]",
-                "recipe[mongodb::source]",
-                "recipe[mysql::server]"
-	      ]
+  "run_list": [ "recipe[mongodb::source]" ]
 }

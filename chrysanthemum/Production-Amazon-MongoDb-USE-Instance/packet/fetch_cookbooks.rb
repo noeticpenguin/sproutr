@@ -20,10 +20,10 @@ class FetchCookbook
   end
 
   def self.find_download_url(cookbook)
-    url = URI.parse("#{COOKBOOK_BASE_URL}/#{cookbook}")
-    res = resolve_url(url)
-    api_data = JSON::parse res.body
-    cookbook_data = JSON::parse resolve_url(URI.parse(api_data["latest_version"])).body
+    url = URI.parse("#{COOKBOOK_BASE_URL}/#{cookbook}/")
+    api_data = JSON::parse resolve_url(url).body
+    version_url = api_data["latest_version"].gsub("opscode_community_http", "community.opscode.com")
+    cookbook_data = JSON::parse resolve_url(URI.parse("#{version_url}/")).body
     return cookbook_data["file"]
   end
 
