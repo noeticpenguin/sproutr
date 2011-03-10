@@ -5,6 +5,7 @@
                 "recipe[memcached::default]",
                 "recipe[mongodb::source]",
                 "recipe[mysql::client]",
-                "recipe[runit::default]"
+                "recipe[runit::default]",
+                "recipe[java_sun::default]"
 	      ]
 }
