@@ -5,13 +5,7 @@ set -x
 
 function configure_drives() {
     echo "--- CONFIGURE DRIVES"
-    apt-get install -y mdadm xfsprogs
-
-    echo "--- configuring write ahead log drive"
-    echo deadline > /sys/block/sde1/queue/scheduler
-    mkfs.ext3 -q -L /wal /dev/sde1
-    mkdir -p /wal && mount -o noatime -t ext3 /dev/sde1 /wal
-    echo "/dev/sde1         /wal        ext3   nodev,nosuid,noatime" >> /etc/fstab
+    apt-get install -y mdadm xfsprogs lvm2
 
     echo "--- creating raid for database cluster"
     for i in /sys/block/sdf{1..4}/queue/scheduler; do
@@ -28,9 +22,9 @@ function configure_drives() {
     pvcreate /dev/md0
     vgcreate vgdb /dev/md0
     lvcreate -n lvdb vgdb -l `/sbin/vgdisplay vgdb | grep Free | awk '{print $5}'`
-    mkfs.xfs -q -L /database /dev/vgdb/lvdb
-    echo "/dev/vgdb/lvdb       /database   xfs   noatime,nosuid,nodev" >> /etc/fstab
-    mkdir -p /database && mount /database
+    mkfs.ext3 -q -L /database /dev/vgdb/lvdb
+    echo "/dev/vgdb/lvdb       /data   ext3   noatime,nosuid,nodev" >> /etc/fstab
+    mkdir -p /data && mount /data
 }
 
 function userdata() {
@@ -39,6 +33,7 @@ function userdata() {
     echo "+++ Beginning userdata.sh run"
     export DEBIAN_FRONTEND="noninteractive"
     export DEBIAN_PRIORITY="critical"
+    echo "" > /etc/rc.local  ## truncate this file - default is 'exit 0' which breaks append ops
 
     configure_drives
 
