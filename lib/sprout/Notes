@@ -5,6 +5,9 @@ specify = create new instance template
 destroy = destroys an instance
 start = start an instance
 stop = stop an instance
+snapshot (all volumes associated with ami)
+clone = create an ami, and build a new ami with it
+
 
 instance templates should
     define chef recipies to run
