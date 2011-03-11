@@ -9,7 +9,7 @@ function userdata() {
     echo "+++ Installing Ruby1.9.1(but it's really 1.9.2)"
 #    sudo add-apt-repository ppa:pratikmsinha/ruby192+bindings
     sudo apt-get update
-    sudo apt-get -y install rubygems
+    sudo apt-get -y install rubygems ruby1.8-dev ruby
     echo "++++ Setting up system links"
     # this is totally hacky and should be replaced with some find fu.
 #    sudo ln -s /usr/bin/erb1.9.1 /usr/bin/erb
