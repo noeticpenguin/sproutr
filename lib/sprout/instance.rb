@@ -1,7 +1,6 @@
 class Instance
 
   def initialize(instance)
-#    ap instance.keys.each {|x| ap x}
     instance.keys.each do |key|
       var = "@#{key}"
 
