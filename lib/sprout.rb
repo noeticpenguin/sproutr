@@ -52,6 +52,7 @@ class Sprout < Thor
     end
     puts ami_table
   end
+
   desc "list", "list all the instances and ami's in your ec2 account"
 
   def list
@@ -114,7 +115,7 @@ class Sprout < Thor
     end
   end
 
-  desc "list_snapshots", "lists all the snapshots available and their status"
+  desc "list_snapshots", "Lists all the snapshots available and their status"
 
   def list_snapshots
     snapshots = @ec2.call("DescribeSnapshots", "Owner" => "self")["snapshotSet"]
@@ -127,7 +128,10 @@ class Sprout < Thor
     puts snapshots_table
   end
 
-  desc "delete_snapshot", "deletes the given snapshot(s) use --snapshot="
+  desc "list_snapshots", "Alias to list_snapshots"
+  alias :list_snapshot :list_snapshots
+
+  desc "delete_snapshot", "Deletes the given snapshot(s) use --snapshot="
   method_option :snapshot, :type => :array, :required => true
 
   def delete_snapshot
@@ -135,6 +139,25 @@ class Sprout < Thor
       result = @ec2.call "DeleteSnapshot", "SnapshotId" => snapshot_id
       say result["return"], :green
     end
+  end
+
+  desc "create_ami", "Create an EBS Ami from a running or stopped instance"
+  method_option :ami, :type => :string, :required => true
+  method_option :name, :type => :string, :required => true
+  method_option :desc, :type => :string, :required => true
+
+  def create_ami
+    @ec2.call "CreateImage", "InstanceId" => options[:ami], "Name" => options[:name], "Description" => options[:desc], "NoReboot" => "true"
+  end
+
+  desc "launch", "launch an instance from the specified config directory"
+  method_option :config_file, :type => :string, :required => true
+
+  def launch
+    config = JSON.parse(File.new(options[:config_file]).read) if File.exists? options[:config_file]
+    throw "Failed to read config file, or config file does not specify an ImageId" unless config && config["ImageId"]
+    
+
   end
 
   desc "debug", "debug info"
