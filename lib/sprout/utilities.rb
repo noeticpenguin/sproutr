@@ -17,6 +17,6 @@ def load_config
 end
 
 def act_on_instance(action, ami)
-  @ec2 ||= Swirl::AWS.new :ec2, load_config
+#  @ec2 ||= Swirl::AWS.new :ec2, load_config
   @ec2.call action, "InstanceId" => ami
 end
