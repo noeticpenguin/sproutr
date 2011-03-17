@@ -100,7 +100,7 @@ class Sprout < Thor
 
   def describe
     options[:ami].each do |ami|
-      say @ec2.call("DescribeInstances", "InstanceId" => ami)["reservationSet"][0]["instancesSet"][0].to_yaml, :blue
+      ap @ec2.call("DescribeInstances", "InstanceId" => ami)["reservationSet"][0]["instancesSet"][0]
     end
   end
 
@@ -155,24 +155,40 @@ class Sprout < Thor
 
   def launch
     config = JSON.parse(File.new(options[:config_file]).read) if File.exists? options[:config_file]
-    throw "Failed to read config file, or config file does not specify an ImageId" unless config && config["ImageId"]
-    
+    throw "Failed to read config file, or config file does not specify an ImageId" unless config["ami"]
+    say invoke_launch(validate_launch_config(config)), :blue
+  end
 
+  desc "clone", "Clone N number of running instance"
+  method_option :instance, :type => :array, :required => true
+  method_option :ami, :type => :string
+  method_option :start, :type => :boolean
+  method_option :tags, :type => :hash
+
+  def clone
+    options[:instance].each do |ami_to_clone|
+      if options[:ami] then
+        ami_id = options[:ami]
+      else
+        ami_id = @ec2.call("CreateImage", "InstanceId" => ami_to_clone, "Name" => "AMI-#{ami_to_clone}-#{Time.now.to_i}", "Description" => "AMI created from #{ami_to_clone} at #{Time.now}", "NoReboot" => "true")["imageId"]
+      end
+      new_config = clone_ami_config(@ec2.call("DescribeInstances", "InstanceId" => ami_to_clone)["reservationSet"][0]["instancesSet"][0], ami_id)
+      until ami_done?(ami_id) do
+        say "Ami has not completed so this clone can not yet be started. Sleeping 30 seconds", :red
+        sleep 30
+      end
+      say "Created and started #{invoke_launch(new_config)}", :green
+#      tag_instance(new_instance, options[:tags])
+    end
   end
 
   desc "debug", "debug info"
 
   def debug
-#    @ec2 ||= Swirl::AWS.new :ec2, load_config
-    snapshots = @ec2.call "DescribeSnapshots", "Owner" => "self"
-    ap snapshots
-#    images = ami_list["imagesSet"].select { |img| img["name"] } rescue nil
-#    @ami_images = Array.new
-#    images.each { |image| @ami_images << Ami.new(image) }
-#    @ami_images.each do |ami|
-#      ap ami.blockDeviceMapping[0]["ebs"]
-#    end
-#    puts ami_table
+    ami_list = @ec2.call "DescribeImages", "Owner" => "self"
+    images = ami_list["imagesSet"].select { |img| img["name"] } rescue nil
+    images = images.map {|image| image["imageId"] if image["imageState"] == "available"}
+
   end
 end
 Sprout.start
