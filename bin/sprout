@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 $:.unshift File.dirname(__FILE__) + "/../lib"
-require 'stem'
+require 'sprout'
 
 # Help is the default.
 ARGV << '-h' if ARGV.empty? && $stdin.tty?

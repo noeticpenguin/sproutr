@@ -8,6 +8,10 @@ class Instance
     end
   end
 
+  def self.call_on(action, ami)
+    @ec2.call action, "InstanceId" => ami
+  end
+
   def method_missing(sym, *args, &block)
     self.instance_variable_get "@#{sym}".to_sym
   end

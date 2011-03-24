@@ -8,7 +8,9 @@ require 'ap'
 require 'terminal-table/import'
 require 'sprout/utilities'
 require 'sprout/instance'
+require 'sprout/cloud'
 require 'sprout/ami'
+require 'sprout/definition'
 
 class Sprout < Thor
   include Thor::Actions
@@ -22,12 +24,10 @@ class Sprout < Thor
   desc "list_instances", "list all the instances in your ec2 account"
 
   def list_instances
-    aws_instances = @ec2.call "DescribeInstances"
-    @instances = Array.new
-    aws_instances["reservationSet"].each { |reservation| @instances << Instance.new(reservation["instancesSet"][0]) }
+    instances = Cloud.new.get_instances
     instance_table = table do |i|
       i.headings = 'Name', 'Instance Id', 'Status', 'ip Address', 'Instance Type', 'AMI Image', 'Availablity Zone', 'DNS Cname'
-      @instances.each do |instance|
+      instances.each do |instance|
         i << [((instance.tagSet.nil?) ? "Name Not Set" : instance.tagSet[0]["value"]),
               instance.instanceId, instance.instanceState["name"], instance.ipAddress,
               instance.instanceType, instance.imageId, instance.placement["availabilityZone"], instance.dnsName]
@@ -39,10 +39,7 @@ class Sprout < Thor
   desc "list_amis", "list all the ami's in your ec2 account"
 
   def list_amis
-    ami_list = @ec2.call "DescribeImages", "Owner" => "self"
-    images = ami_list["imagesSet"].select { |img| img["name"] } rescue nil
-    @ami_images = Array.new
-    images.each { |image| @ami_images << Ami.new(image) }
+    @ami_images = Cloud.new.get_images
     ami_table = table do |a|
       a.headings = 'Name', 'AMI Id', 'Type', 'State', 'Size', 'Architecture', 'Public?', 'Description'
       @ami_images.each do |ami|
@@ -56,29 +53,29 @@ class Sprout < Thor
   desc "list", "list all the instances and ami's in your ec2 account"
 
   def list
-    list_instances()
-    list_amis()
+    invoke :list_instances
+    invoke :list_amis
   end
 
   desc "start", "Start the specified instance(s), requires --ami="
   method_option :ami, :type => :array, :required => true
 
   def start
-    options[:ami].each { |ami| act_on_instance("StartInstances", ami) }
+    options[:ami].each { |ami| Instance::call_on("StartInstances", ami) }
   end
 
   desc "stop", "Stop the specified instance(s), requires --ami="
   method_option :ami, :type => :array, :required => true
 
   def stop
-    options[:ami].each { |ami| act_on_instance("StopInstances", ami) }
+      options[:ami].each { |ami| Instance::call_on("StopInstances", ami) if yes? "Do you really want to stop the #{instance} instance? ", :red }
   end
 
   desc "restart", "Restart the specified instance(s), requires --ami="
   method_option :ami, :type => :array, :required => true
 
   def restart
-    options[:ami].each { |ami| act_on_instance("RebootInstances", ami) }
+    options[:ami].each { |ami| Instance::call_on("RebootInstances", ami) }
   end
 
   desc "terminate", "Terminate the specified instance, requires --ami="
@@ -87,7 +84,7 @@ class Sprout < Thor
   def terminate
     options[:ami].each do |ami|
       verify = ask "Do you really want to terminate the #{ami} instance? ", :red
-      act_on_instance("TerminateInstances", ami) if verify.downcase == "y" || verify.downcase == "yes"
+      Instance::call_on("TerminateInstances", ami) if verify.downcase == "y" || verify.downcase == "yes"
     end
   end
 
@@ -177,18 +174,35 @@ class Sprout < Thor
         say "Ami has not completed so this clone can not yet be started. Sleeping 30 seconds", :red
         sleep 30
       end
-      say "Created and started #{invoke_launch(new_config)}", :green
-#      tag_instance(new_instance, options[:tags])
+      new_instance = invoke_launch(new_config)
+      say "Created and started #{new_instance}", :green
+      tag_instance(new_instance, options[:tags]) if options[:tags]
     end
   end
 
-  desc "debug", "debug info"
+  desc "define", "define a new instance"
 
-  def debug
-    ami_list = @ec2.call "DescribeImages", "Owner" => "self"
-    images = ami_list["imagesSet"].select { |img| img["name"] } rescue nil
-    images = images.map {|image| image["imageId"] if image["imageState"] == "available"}
-
+  def define
+    definition = Definition.new do |d|
+      d.name = demand "What do you want to call this definition (Required): "
+      d.size = demand "What size instance do you want (Required): "
+      d.ami = demand "What base AMI image would you like to use (Required): "
+      ami_info = Cloud.new.describe_image(d.ami)
+      break unless yes? "Is this the Image -- #{ami_info["imagesSet"][0]["name"]} -- you wish to build from?", :red
+      d.packages = ask "What additional packages do you want installed (Optional): ", :green
+      d.gems = ask "What gems do you want to install on this machine by default (Optional): ", :green
+      d.chef_cookbooks = ask "Please name the chef cookbooks you wish to automatically download (Optional): ", :green
+      d.chef_recipes = ask "Enter the recipes you wish chef to run after cookbooks are installed (Optional): ", :green
+      d.user_data = demand "Please copy/paste your Userdata.sh here now. Note, sprout will automatically add in the
+requisite code to download and install Cheff cookbooks, and aggregate additional volumes
+into a singluar raid array (Required): "
+      d.tags = ask "Please enter the tags you'd like in name:value format (Optional, Note that the Name will automatically be specified): ", :green
+      d.volumes = ask "Please enter the number of additional volumes (Optional, Note that these additional volumes will be RAID/LVM enabled as 1 *logical* volume): ", :green
+      d.volume_size = ask "Please enter the size of each component volume in Gigabytes (Optional, Currently all volumes are identical in size): ", :green
+      d.availability_zone = demand "Please enter the availability zone you wish to instantiate this machine in: " 
+      d.key_name = demand "Which key-pair would you like to use? use the key name: " 
+    end
+    definition.save_to_file(definition.name+"_definition.json")
   end
 end
 Sprout.start

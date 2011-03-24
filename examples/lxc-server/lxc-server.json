@@ -1,5 +1,0 @@
-{ "ami"                       : "ami-1634de7f",
-  "instance_type"             : "m1.large",
-  "key_name"                  : "ops_testing"
-}
-

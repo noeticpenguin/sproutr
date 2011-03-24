@@ -16,11 +16,6 @@ def load_config
   end
 end
 
-def act_on_instance(action, ami)
-#  @ec2 ||= Swirl::AWS.new :ec2, load_config
-  @ec2.call action, "InstanceId" => ami
-end
-
 def invoke_launch(config)
   response = @ec2.call "RunInstances", config
   response["instancesSet"].first["instanceId"]
@@ -102,4 +97,12 @@ end
 def tag_instance(instance_id, tags)
   instance_id = [instance_id] unless instance_id.is_a? Array
   @ec2.call("CreateTags", parse_tags(tags).merge("ResourceId" => instance_id))
+end
+
+def demand(question)
+  answer = nil
+  while answer.nil? or answer.strip == ""
+    answer = ask question, :green
+  end
+  answer
 end
