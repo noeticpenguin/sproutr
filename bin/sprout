@@ -2,12 +2,5 @@
 $:.unshift File.dirname(__FILE__) + "/../lib"
 require 'sprout'
 
-# Help is the default.
-ARGV << '-h' if ARGV.empty? && $stdin.tty?
 
-# Process options
-Stem::CLI.parse_options(ARGV) if $stdin.tty?
-
-# Still here - run the command
-Stem::CLI.dispatch_command(ARGV.shift, ARGV)
 
