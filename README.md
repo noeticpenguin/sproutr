@@ -1,60 +1,65 @@
-#Stem
-##EC2 made easy.
+#Sprout
+##EC2 made stupid simple.
 
 ##Introduction
 
-Stem is a thin, light-weight EC2 instance management library which abstracts the Amazon EC2 API and provides an intuitive interface for designing, launching, and managing running instances.
+sprout is a thor based EC2 instance management library which abstracts the Amazon EC2 API and provides an interactive interface for designing, launching, and managing running instances.
 
-Stem is named after the model it encourages -- simple AMIs created on demand with many running copies derived from that.
+sprout is based around the idea of helping you define an instance, launch it, then create as many copies of that as you need. Currently Sprout supports the following tasks:
+  Sprout clone --instance=one two three                # Clone N number of running instance
+  Sprout create_ami --ami=AMI --desc=DESC --name=NAME  # Create an EBS Ami from a running or stopped instance
+  Sprout define                                        # define a new instance
+  Sprout delete_snapshot --snapshot=one two three      # Deletes the given snapshot(s) use --snapshot=
+  Sprout describe --ami=one two three                  # Describe a specific instance
+  Sprout destroy --ami=one two three                   # Alias to terminate
+  Sprout help [TASK]                                   # Describe available tasks or one specific task
+  Sprout launch --config-file=CONFIG_FILE              # launch an instance from the specified config directory
+  Sprout list                                          # list all the instances and ami's in your ec2 account
+  Sprout list_amis                                     # list all the ami's in your ec2 account
+  Sprout list_instances                                # list all the instances in your ec2 account
+  Sprout list_snapshots                                # Alias to list_snapshots
+  Sprout list_snapshots                                # Lists all the snapshots available and their status
+  Sprout restart --ami=one two three                   # Restart the specified instance(s), requires --ami=
+  Sprout snapshot --ami=one two three                  # Create snapshot
+  Sprout start --ami=one two three                     # Start the specified instance(s), requires --ami=
+  Sprout stop --ami=one two three                      # Stop the specified instance(s), requires --ami=
+  Sprout terminate --ami=one two three                 # Terminate the specified instance, requires --ami=
 
 ##Configuration
 
-Stem relies on the Swirl library, which needs to be passed your AWS credentials to do its magic.  There are two ways to set these.
-
-In your environment:
-
-	export AWS_ACCESS_KEY_ID=my_access_key
-	export AWS_SECRET_ACCESS_KEY=my_secret_key
-
-or in ~/.swirl:
-
-	--- 
+Sprout relies on the Swirl library, which needs to be passed your AWS credentials to do its magic.  Sprout therefore requires that you provide a .swirlrc file in your home directory (~/) that contains:
+~/.swirl:
+	---
 	:default: 
 	  :aws_access_key_id: my_access_key
 	  :aws_secret_access_key: my_secret_key
 
 ##Usage
 
-You can use Stem to manage your instances either from the commandline or directly via the library. You should create an instance which will serve as your "stem" and be converted into an AMI. Once you have tested this instance, create a snapshot of the instance, then use it by name to launch new instances with their own individual configuration.
+You can use Sprout to manage your instances from the commandline. You should create an instance which will serve as your "Sprout" and be converted into an AMI.
+Once you have tested this instance, create a snapshot of the instance, then use it by AMI-Id to launch new instances with their own individual configuration.
 
-Here's a simple example from the command line. Begin by launching the example prototype instance.
+Here's a simple example from the command line. Begin by invoking the define task.
 
-    $ bin/stem launch chrysanthemum/postgres-prototype/config.json chrysanthemum/postgres-prototype/userdata.sh
+    $ bin/Sprout define
 
-The config.json file specifies which AMI to start from, and what kind of EBS drive configuration to use. It is important that the drives are specified in the configuration file as any drives attached to the instance after launch will not become part of the eventual AMI you are creating 
+Sprouts define task will walk you through the process of determining the name, instance size, starting AMI etc.
+Key to the sprout experience is the way handles two key features: Chef and Volumes:
+    Sprout builds the instance with knowledge of, and the ability to execute arbitrary chef cookbooks/recipes.
+    While defining an instance you're given the opportunity to specify additional packages, cookbooks and recipes to have installed
+    Currently only Debian (ubuntu, mint, etc.) based distributions are supported.
+    Additionally, be aware that any volumes you specify will be aggregated together using mdadm and lvm into one logical volume.
+
+Once defined, you can launch the instance via
+
+    $ Sprout launch --definition=filename.json
 
 You can monitor the instance's fabrication process via
 
-    $ stem list
+    $ Sprout list
 
-The instance you created will boot, install some packages on top of a stock Ubuntu 10.4 AMI, then (if everything goes according to plan) shut itself down and go into a "stopped" state that indicates success. If any part of the stem fabrication fails, the instance will remain running. Once the instance reaches stopped, type
-
-    $ stem create postgres-server <instance-id> appserver,current,tag_3
-
-The AMI may take as long as half an hour to build, depending on how the gremlins in EC2 are behaving on any given day. You can check on their progress with
-
-    $ bin/amy
-
-If the AMI fabrication reaches the state "failed" you will have to manually reissue the `create` command and hope that the gremlins are more forgiving the second time around.
-
-Now that you have a simple postgres-server, you'll want to boot it up and create a database on it with some unique credentials! One of the simplest ways to solve this problem is to provide the instance with a templated userdata script which will perform per-instance configuration. I like mustache for this purpose.
-
-    $ mustache userdata.sh.yaml postgres-server/userdata.sh.mustache > postgres-server/userdata.sh
-    $ stem launch postgres-server/config.json postgres-server/userdata.sh
-
-You can, of course, delete the produced userdata.sh once the instance is launched.
+The instance you created will boot, install your selected packages on top of the stock AMI you selected, then download and cook all the cookbooks and recipes you selected.
 
 ##Inspiration and Thanks
 
-Stem is almost entirely based on Orion Henry's Judo gem, and Blake Mizerany's work on variously patton, carealot, napkin, and several other experiments. Thanks also for feedback, testing and patches from Adam Wiggins, Mark McGranahan, Noah Zoschke, Jason Dusek, and Blake Gentry.
-
+Sprout is almost entirely based on the stem gem, a product (so far as I can tell) a gift of the Heroku development / operations team. 

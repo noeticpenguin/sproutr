@@ -1,7 +1,7 @@
 require 'json'
 
 class Definition
-  FILE_PREFIX = "Configs/machine_definitions/"
+  FILE_PREFIX = "~/Sprout_configs/machine_definitions/"
   %x{mkdir -p #{FILE_PREFIX} } unless File.directory? FILE_PREFIX
   attr_accessor :name, :gems, :user_data, :packages, :size, :chef_cookbooks, :chef_recipes, :ami, :tags, :volumes, :volume_size, :availability_zone, :key_name, :chef_install
 
@@ -23,9 +23,4 @@ class Definition
     end
     File.open(FILE_PREFIX + filename, 'w') {|f| f.write(hash_of_definition.to_json) }
   end
-
-  def launch
-
-  end
-
 end
