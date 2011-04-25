@@ -1,5 +1,5 @@
 require 'swirl/aws'
-require 'sprout/utilities'
+require 'sproutr/utilities'
 
 class Cloud
 

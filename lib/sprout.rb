@@ -6,13 +6,13 @@ require 'json'
 require 'thor'
 require 'ap'
 require 'terminal-table/import'
-require 'sprout/utilities'
-require 'sprout/instance'
-require 'sprout/cloud'
-require 'sprout/ami'
-require 'sprout/definition'
+require 'sproutr/utilities'
+require 'sproutr/instance'
+require 'sproutr/cloud'
+require 'sproutr/ami'
+require 'sproutr/definition'
 
-class Sprout < Thor
+class Sproutr < Thor
   include Thor::Actions
   map "-l" => :list
 
@@ -68,7 +68,7 @@ class Sprout < Thor
       d.gems = ask "What gems do you want to install on this machine by default (Optional): ", :green
       d.chef_cookbooks = ask "Please name the chef cookbooks you wish to automatically download (Optional): ", :green
       d.chef_recipes = ask "Enter the recipes you wish chef to run after cookbooks are installed (Optional): ", :green
-      d.user_data = demand "Please copy/paste your Userdata.sh here now. Note, sprout will automatically add in the
+      d.user_data = demand "Please copy/paste your Userdata.sh here now. Note, sproutr will automatically add in the
 requisite code to download and install Cheff cookbooks, and aggregate additional volumes
 into a singluar raid array (Required): "
       d.tags = ask "Please enter the tags you'd like in name:value format (Optional, Note that the Name will automatically be specified): ", :green
@@ -166,7 +166,7 @@ into a singluar raid array (Required): "
 
   desc "snapshot", "Create snapshot"
   method_option :ami, :type => :array, :required => true
-  method_options :desc => "Snapshot created by Sprout"
+  method_options :desc => "Snapshot created by sproutr"
 
   def snapshot
     options[:ami].each do |ami|
@@ -210,4 +210,4 @@ into a singluar raid array (Required): "
   alias :list_snapshot :list_snapshots
 
 end
-Sprout.start
+Sproutr.start
