@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="RUBY_MODULE" version="4">
+  <component name="DBNavigator.Module.ConnectionManager">
+    <connections />
+  </component>
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] rake (v0.8.3, /System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/gems/1.8/gems/rake-0.8.3)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] thor (v0.14.6, /Library/Ruby/Gems/1.8/gems/thor-0.14.6)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] terminal-table (v1.4.2, /Library/Ruby/Gems/1.8/gems/terminal-table-1.4.2)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] crack (v0.1.8, /Library/Ruby/Gems/1.8/gems/crack-0.1.8)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] ruby-hmac (v0.4.0, /Library/Ruby/Gems/1.8/gems/ruby-hmac-0.4.0)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] swirl (v1.7.5, /Library/Ruby/Gems/1.8/gems/swirl-1.7.5)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] json (v1.5.1, /Library/Ruby/Gems/1.8/gems/json-1.5.1)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] awesome_print (v0.3.2, /Library/Ruby/Gems/1.8/gems/awesome_print-0.3.2)" level="application" />
+  </component>
+</module>
+

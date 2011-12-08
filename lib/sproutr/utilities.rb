@@ -21,14 +21,15 @@ def invoke_launch(config)
   response["instancesSet"].first["instanceId"]
 end
 
-def validate_launch_config(config)
+def validate_launch_config(config, availability_zone = nil)
   instance_options = {
       "SecurityGroup.#" => config["groups"] || [],
       "MinCount" => "1",
       "MaxCount" => "1",
       "KeyName" => config["key_name"] || "Production",
       "InstanceType" => config["instance_type"] || "m1.small",
-      "ImageId" => config["ami"]
+      "ImageId" => config["ami"],
+      "AvailabilityZone" => availability_zone || config["placement"]["availabilityZone"]
   }
 
   if config["volumes"]
